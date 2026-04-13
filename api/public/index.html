@@ -1,0 +1,332 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Ibiza — Dashboard Promoteur</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a0f;color:#fff;min-height:100vh;}
+.header{padding:16px 16px 8px;background:#0a0a0f;position:sticky;top:0;z-index:100;border-bottom:1px solid #1e1e2e;}
+.header h1{font-size:20px;font-weight:700;letter-spacing:-0.5px;}
+.header h1 span{color:#7c6aff;}
+.updated{font-size:11px;color:#555;margin-top:2px;}
+.tab-bar{display:flex;gap:0;background:#111118;border-bottom:1px solid #1e1e2e;overflow-x:auto;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab{flex:1;min-width:80px;padding:12px 8px;border:none;background:transparent;color:#666;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;}
+.tab.active{color:#7c6aff;border-bottom-color:#7c6aff;}
+.screen{display:none;padding:16px;}
+.screen.active{display:block;}
+.day-pills{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none;margin-bottom:14px;}
+.day-pills::-webkit-scrollbar{display:none;}
+.day-pill{flex-shrink:0;padding:7px 14px;border-radius:20px;border:1px solid #1e1e2e;background:#111118;color:#888;font-size:13px;cursor:pointer;}
+.day-pill.active{background:#7c6aff;color:#fff;border-color:#7c6aff;}
+.club-card{background:#111118;border:1px solid #1e1e2e;border-radius:14px;margin-bottom:12px;overflow:hidden;}
+.club-card.closed{opacity:0.35;}
+.card-header{display:flex;justify-content:space-between;align-items:center;padding:13px 15px;border-bottom:1px solid #1e1e2e;}
+.card-name{font-size:15px;font-weight:600;}
+.card-price{font-size:16px;font-weight:700;}
+.price-low{color:#4ade80;}
+.price-mid{color:#fbbf24;}
+.price-high{color:#f87171;}
+.price-closed{color:#555;}
+.card-body{padding:11px 15px;}
+.card-dj{font-size:14px;color:#a78bfa;font-weight:500;margin-bottom:6px;}
+.card-meta{display:flex;gap:8px;flex-wrap:wrap;}
+.meta-tag{padding:3px 9px;border-radius:20px;font-size:11px;background:#1a1a2e;color:#888;}
+.meta-loc{color:#6ee7b7;background:#0d2e22;}
+.section-label{font-size:11px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;}
+.client-bar{background:#111118;border:1px solid #1e1e2e;border-radius:12px;padding:14px;margin-bottom:16px;}
+.client-label{font-size:12px;color:#666;margin-bottom:10px;}
+.input-row{display:flex;gap:8px;}
+.input-row input,.input-row select{flex:1;padding:10px 12px;border-radius:8px;border:1px solid #1e1e2e;background:#0a0a0f;color:#fff;font-size:14px;-webkit-appearance:none;}
+.comp-card{background:#111118;border:1px solid #1e1e2e;border-radius:12px;margin-bottom:10px;overflow:hidden;}
+.comp-card.best{border-color:#7c6aff;}
+.best-badge{background:#7c6aff;color:#fff;font-size:11px;font-weight:600;padding:4px 12px;display:block;}
+.comp-header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;}
+.comp-name{font-size:14px;font-weight:600;}
+.comp-price{font-size:20px;font-weight:700;}
+.comp-body{padding:0 14px 12px;}
+.comp-dj{font-size:13px;color:#a78bfa;margin-bottom:3px;}
+.comp-loc{font-size:12px;color:#555;}
+.empty{text-align:center;padding:40px 20px;color:#555;font-size:14px;}
+.fiche-card{background:#111118;border:1px solid #1e1e2e;border-radius:14px;padding:16px;margin-bottom:14px;}
+.fiche-days{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.fiche-day-btn{padding:6px 13px;border-radius:8px;border:1px solid #1e1e2e;background:#0a0a0f;color:#888;font-size:13px;cursor:pointer;}
+.fiche-day-btn.active{background:#1D9E75;color:#fff;border-color:#1D9E75;}
+.fiche-table{width:100%;border-collapse:collapse;}
+.fiche-table tr{border-bottom:1px solid #1e1e2e;}
+.fiche-table tr:last-child{border-bottom:none;}
+.fiche-table td{padding:10px 4px;font-size:13px;}
+.fiche-table td:first-child{color:#fff;font-weight:500;width:35%;}
+.fiche-table td:nth-child(2){color:#a78bfa;font-weight:700;text-align:center;width:18%;}
+.fiche-table td:last-child{color:#888;text-align:right;font-size:12px;width:47%;}
+.share-btn{width:100%;padding:14px;border-radius:12px;border:none;background:#7c6aff;color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;}
+.share-btn:active{background:#6350e0;}
+.tip-box{background:#1a1a2e;border-radius:10px;padding:11px 14px;margin-bottom:14px;font-size:13px;color:#a78bfa;}
+.loader{text-align:center;padding:60px 20px;color:#555;}
+.loader .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#7c6aff;margin:0 3px;animation:bounce 1.2s infinite;}
+.loader .dot:nth-child(2){animation-delay:0.2s;}
+.loader .dot:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-8px)}}
+.refresh-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;border:1px solid #1e1e2e;background:transparent;color:#666;font-size:12px;cursor:pointer;margin-left:auto;}
+.refresh-btn:active{background:#1e1e2e;}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block;}
+.status-dot.loading{background:#fbbf24;animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <h1>Ibiza <span>Pro</span></h1>
+      <div class="updated" id="updated-time">Chargement...</div>
+    </div>
+    <button class="refresh-btn" onclick="loadData()">
+      <span class="status-dot" id="status-dot"></span>
+      Actualiser
+    </button>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab active" onclick="showScreen('tonight',this)">🌙 Ce soir</button>
+  <button class="tab" onclick="showScreen('compare',this)">⚖️ Comparer</button>
+  <button class="tab" onclick="showScreen('fiche',this)">📋 Fiche</button>
+</div>
+
+<div class="screen active" id="screen-tonight">
+  <div class="day-pills" id="tonight-days"></div>
+  <div id="tonight-list"><div class="loader"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>
+</div>
+
+<div class="screen" id="screen-compare">
+  <div class="client-bar">
+    <div class="client-label">Budget client (€/pers) + ambiance</div>
+    <div class="input-row">
+      <input type="number" id="budget-val" placeholder="Budget max €" oninput="renderCompare()">
+      <select id="vibe-sel" onchange="renderCompare()">
+        <option value="all">Toute ambiance</option>
+        <option value="underground">Underground</option>
+        <option value="mainstream">Mainstream</option>
+        <option value="open-air">Open-air</option>
+        <option value="intimiste">Intimiste</option>
+      </select>
+    </div>
+  </div>
+  <div id="compare-list"><div class="empty">Entre un budget pour voir les options</div></div>
+</div>
+
+<div class="screen" id="screen-fiche">
+  <div class="fiche-card">
+    <div class="section-label">Sélectionne le(s) soir(s)</div>
+    <div class="fiche-days" id="fiche-days"></div>
+    <div class="tip-box" id="fiche-tip">Choisis un ou plusieurs jours</div>
+    <table class="fiche-table" id="fiche-table"></table>
+  </div>
+  <button class="share-btn" onclick="copyFiche()">📤 Copier pour WhatsApp</button>
+</div>
+
+<script>
+const DAYS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+const DAYS_FULL = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+
+const CLUBS_BASE = [
+  {name:'Hï Ibiza', loc:'Playa d\'en Bossa', prices:[50,50,55,60,65,100,50], djs:['Francis Mercier','East End Dubs','Meduza & James Hype','Hugel','Dom Dolla','Black Coffee','Mestiza'], vibes:['underground','house'], tags:['Top 100 #2']},
+  {name:'Ushuaïa', loc:'Playa d\'en Bossa', prices:[110,120,80,85,120,65,90], djs:['David Guetta','Calvin Harris','Tomorrowland','Martin Garrix','Calvin Harris','ANTS','Swedish House Mafia'], vibes:['mainstream','open-air'], tags:['Open-air','15h–23h']},
+  {name:'Amnesia', loc:'San Rafael', prices:[50,60,60,50,60,40,50], djs:['Kettama','Joseph Capriati','SOON','Josh Baker','Glitterbox','Bresh','SOON'], vibes:['underground','house'], tags:['Légendaire']},
+  {name:'Pacha', loc:'Centre Ibiza', prices:[35,40,35,40,70,40,null], djs:['Sonny Fodera','Vintage Culture','Blondish','Purple Disco Machine','Music On','Robin Schulz','—'], vibes:['mainstream','house'], tags:['Emblématique']},
+  {name:'Chinois', loc:'Ibiza', prices:[null,null,null,30,null,30,40], djs:['—','—','—','—','—','—','—'], vibes:['intimiste'], tags:['Sélectif']},
+  {name:'[UNVRS]', loc:'San Rafael', prices:[60,80,85,80,100,95,90], djs:['John Summit','Anyma','Jamie Jones','Fisher','David Guetta','ELROW','Carl Cox'], vibes:['underground','mainstream'], tags:['Nouveau 2025']}
+];
+
+let clubs = JSON.parse(JSON.stringify(CLUBS_BASE));
+let todayIdx = new Date().getDay();
+todayIdx = todayIdx === 0 ? 6 : todayIdx - 1;
+let selTonight = todayIdx;
+let selFiche = [todayIdx];
+
+function priceColor(p){
+  if(!p) return 'price-closed';
+  if(p<=50) return 'price-low';
+  if(p<=80) return 'price-mid';
+  return 'price-high';
+}
+
+async function loadData(){
+  const dot = document.getElementById('status-dot');
+  dot.className = 'status-dot loading';
+  document.getElementById('updated-time').textContent = 'Mise à jour...';
+  try {
+    const r = await fetch('/api/events');
+    if(r.ok){
+      const data = await r.json();
+      if(data.clubs){
+        data.clubs.forEach(live => {
+          const club = clubs.find(c => c.name === live.name);
+          if(club && live.price) {
+            // update today's price if we got live data
+            club.prices[todayIdx] = live.price;
+          }
+        });
+        const d = new Date(data.updated);
+        document.getElementById('updated-time').textContent = 'Mis à jour ' + d.toLocaleDateString('fr-FR', {day:'numeric',month:'short'}) + ' à ' + d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      }
+    } else {
+      document.getElementById('updated-time').textContent = 'Données hors-ligne (base fixe)';
+    }
+  } catch(e) {
+    document.getElementById('updated-time').textContent = 'Données hors-ligne (base fixe)';
+  }
+  dot.className = 'status-dot';
+  renderAll();
+}
+
+function buildTonightDays(){
+  document.getElementById('tonight-days').innerHTML = DAYS.map((d,i)=>
+    `<button class="day-pill ${i===selTonight?'active':''}" onclick="selectTonightDay(${i})">${d}</button>`
+  ).join('');
+}
+
+function selectTonightDay(i){
+  selTonight=i;
+  buildTonightDays();
+  renderTonight();
+}
+
+function renderTonight(){
+  const i = selTonight;
+  const list = clubs.map(c=>({...c,price:c.prices[i],dj:c.djs[i]}))
+    .sort((a,b)=>{
+      if(!a.price && b.price) return 1;
+      if(a.price && !b.price) return -1;
+      return a.price - b.price;
+    });
+  document.getElementById('tonight-list').innerHTML = list.map(c=>{
+    const closed = !c.price;
+    return `<div class="club-card ${closed?'closed':''}">
+      <div class="card-header">
+        <span class="card-name">${c.name}</span>
+        <span class="card-price ${priceColor(c.price)}">${c.price?'€'+c.price:'Fermé'}</span>
+      </div>
+      ${!closed?`<div class="card-body">
+        <div class="card-dj">🎧 ${c.dj}</div>
+        <div class="card-meta">
+          ${c.tags.map(t=>`<span class="meta-tag">${t}</span>`).join('')}
+          <span class="meta-tag meta-loc">📍 ${c.loc}</span>
+        </div>
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderCompare(){
+  const budget = parseInt(document.getElementById('budget-val').value)||999999;
+  const vibe = document.getElementById('vibe-sel').value;
+  const i = selTonight;
+  let results = clubs.filter(c=>{
+    const p = c.prices[i];
+    if(!p || p>budget) return false;
+    if(vibe!=='all' && !c.vibes.includes(vibe)) return false;
+    return true;
+  }).sort((a,b)=>a.prices[i]-b.prices[i]);
+
+  if(!document.getElementById('budget-val').value){
+    document.getElementById('compare-list').innerHTML='<div class="empty">Entre un budget pour voir les options</div>';
+    return;
+  }
+  if(results.length===0){
+    document.getElementById('compare-list').innerHTML='<div class="empty">Aucun club dans ce budget ce soir.<br>Essaie d\'augmenter ou de changer le jour.</div>';
+    return;
+  }
+  document.getElementById('compare-list').innerHTML = results.map((c,idx)=>{
+    const p = c.prices[i];
+    return `<div class="comp-card ${idx===0?'best':''}">
+      ${idx===0?'<span class="best-badge">⭐ Meilleur rapport qualité/prix ce soir</span>':''}
+      <div class="comp-header">
+        <span class="comp-name">${c.name}</span>
+        <span class="comp-price ${priceColor(p)}">€${p}</span>
+      </div>
+      <div class="comp-body">
+        <div class="comp-dj">🎧 ${c.djs[i]}</div>
+        <div class="comp-loc">📍 ${c.loc} · ${c.tags.join(' · ')}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function buildFicheDays(){
+  document.getElementById('fiche-days').innerHTML = DAYS.map((d,i)=>
+    `<button class="fiche-day-btn ${selFiche.includes(i)?'active':''}" onclick="toggleFiche(${i})">${d}</button>`
+  ).join('');
+}
+
+function toggleFiche(i){
+  if(selFiche.includes(i)) selFiche=selFiche.filter(x=>x!==i);
+  else selFiche.push(i);
+  buildFicheDays();
+  renderFiche();
+}
+
+function renderFiche(){
+  if(!selFiche.length){
+    document.getElementById('fiche-tip').textContent='Sélectionne au moins un jour.';
+    document.getElementById('fiche-table').innerHTML='';
+    return;
+  }
+  const days=selFiche.slice().sort((a,b)=>a-b);
+  const openClubs = clubs.filter(c=>days.some(d=>c.prices[d]));
+  document.getElementById('fiche-tip').textContent=`${openClubs.length} clubs · ${days.map(d=>DAYS_FULL[d]).join(', ')}`;
+
+  let rows='';
+  days.forEach(d=>{
+    clubs.forEach(c=>{
+      const p=c.prices[d];
+      if(!p) return;
+      const label = days.length>1 ? `${c.name} <span style="font-size:10px;color:#555">${DAYS[d]}</span>` : c.name;
+      rows+=`<tr><td>${label}</td><td class="${priceColor(p)}">€${p}</td><td>${c.djs[d]}</td></tr>`;
+    });
+  });
+  document.getElementById('fiche-table').innerHTML=rows;
+}
+
+function copyFiche(){
+  const days=selFiche.slice().sort((a,b)=>a-b);
+  let txt='🌴 IBIZA — Programme & Tarifs\n';
+  days.forEach(d=>{
+    txt+=`\n📅 ${DAYS_FULL[d]}\n`;
+    clubs.forEach(c=>{
+      const p=c.prices[d];
+      if(!p) return;
+      txt+=`• ${c.name} → €${p}/pers · 🎧 ${c.djs[d]}\n`;
+    });
+  });
+  txt+='\nRéservations via votre promoteur 🎟️';
+  navigator.clipboard.writeText(txt)
+    .then(()=>{ const b=document.querySelector('.share-btn'); b.textContent='✅ Copié !'; setTimeout(()=>b.textContent='📤 Copier pour WhatsApp',2000); })
+    .catch(()=>alert('Copie manuelle:\n\n'+txt));
+}
+
+function showScreen(name,btn){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function renderAll(){
+  buildTonightDays();
+  renderTonight();
+  buildFicheDays();
+  renderFiche();
+  renderCompare();
+}
+
+renderAll();
+loadData();
+</script>
+</body>
+</html>
